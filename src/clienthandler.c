@@ -21,7 +21,7 @@ void* clienthandler(void* arg){
         char buffer[BUFFER_SIZE] = {0};
         
         if(recv(client_socket, buffer, BUFFER_SIZE, 0)<=0){
-            printf("Veri alinamadi veya baglanti kapandi\n");
+            printf("Connection closed\n");
             close(client_socket);
             free(clientArgs);
             
@@ -43,7 +43,7 @@ void* clienthandler(void* arg){
 
                 filename[length]='\0';
                  if (strstr(filename, "..") != NULL) {
-                    char *forbidden = "HTTP/1.1 403 Forbidden\r\n\r\nErisim Reddedildi!";
+                    char *forbidden = "HTTP/1.1 403 Forbidden\r\n\r\nConnection refused!";
                     send(client_socket, forbidden, strlen(forbidden), 0);
                     close(client_socket);
                     free(clientArgs);
@@ -52,17 +52,16 @@ void* clienthandler(void* arg){
 
 
                 if((filename[0]=='/')&&(filename[1]=='\0')){
-                    strcpy(filename,"/index.html");
+                    strcpy(filename,"index.html");
                 }
                 printf("----------------------------------\n");
                 
-                printf("ISTENEN DOSYA: %s-< \n",filename);
+                printf("FILE: %s-< \n",filename);
                 printf("----------------------------\n");
-                printf("DEBUG: filename icerigi: [%s]\n", filename);
-                printf("DEBUG: filename+1 icerigi: [%s]\n", filename + 1);
-                char path[255] = "public/";
+                
+                char path[255] = "../public/";
                 strcat(path,filename+1);
-                printf("DEBUG: path icerigi: [%s]\n", path);
+                
                
                 FILE* file = fopen((path),"rb");
                 if(file==NULL){
@@ -94,7 +93,7 @@ void* clienthandler(void* arg){
 
                 char response_header[BUFFER_SIZE];
                 
-                printf("DOSYA ICERIGI: %s\n",file_content);
+                printf("File Content: %s\n",file_content);
                 
                 const char* content_type = get_content_type(filename);
 
