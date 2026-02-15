@@ -7,8 +7,12 @@
 #include <pthread.h>
 #include "../headers/content-type.h"
 #include "../headers/clienthandler.h"
+#include "../headers/TPOOL.h"
 #define PORT 8080
 #define BUFFER_SIZE 1024
+
+const size_t num_threads = 4;
+
 
 
 int main(){
@@ -43,6 +47,14 @@ int main(){
     }
 
     printf("Server is listening on %d port\n",PORT);
+
+    tpool_t *tm;
+    int *vals;
+    
+
+    tm = tpool_create(num_threads);
+
+   
     
     while(1){
          
@@ -57,8 +69,12 @@ int main(){
         clientArgs->addrlen = addrlen;
         clientArgs->address = address;
         clientArgs->client_socket = new_socket;
-        pthread_create(&thread_id, NULL, clienthandler, (void*)clientArgs);
-        pthread_detach(thread_id);
+
+
+
+       
+        tpool_add_work(tm,(thread_func_t)(clienthandler), (void*)clientArgs);
+
 
 
 
@@ -68,6 +84,7 @@ int main(){
     send(server_fd, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
     
     close(server_fd);
+    tpool_destroy(tm);
     return 0;
 }
 
