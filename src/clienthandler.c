@@ -133,7 +133,9 @@ void* clienthandler(void* arg){
                     char *ok_response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
                     send(client_socket, ok_response, strlen(ok_response), 0);
                 }
-               
+               char path[256];
+               sscanf(buffer, "%*s %s",path);
+               printf("Path: %s\n",path);
                buffer[size]='\0';
                printf("POST header: %s\n",buffer);
                char* line = strstr(buffer,"Content-Length:");
@@ -162,9 +164,25 @@ void* clienthandler(void* arg){
                char* body = buffer+header_length;
 
                body[content_length]='\0';
+               if(strcmp(path,"/submit")==0){
                
                printf("POST body: %s\n",body);
 
+               char* pair = strtok(body,"&");
+               while(pair!=NULL){
+                char* key = strtok(pair,"=");
+
+                char* value = strtok(NULL,"=");
+
+                if(key&&value){
+                    printf("Key: %s, Value: %s\n",key,value);
+                }
+                   pair = strtok(NULL,"&");
+
+            }
+         
+              
+        }
                
                
 
