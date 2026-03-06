@@ -11,5 +11,6 @@ typedef struct ClientArgs{
     struct sockaddr_in address;
 }ClientArgs;
 void* clienthandler(void* arg);
-static bool has_keep_alive(const char *buf,size_t len);
+int parsefind(char* buffer,size_t len);
+void tokenizer(char* body);
 #endif 
