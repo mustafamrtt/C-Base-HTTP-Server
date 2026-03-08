@@ -13,4 +13,6 @@ typedef struct ClientArgs{
 void* clienthandler(void* arg);
 int parsefind(char* buffer,size_t len);
 void tokenizer(char* body);
+int get_method(char* buffer,int client_socket);
+void post_method(char* buffer,int header_length,int client_socket,int size);
 #endif 

@@ -81,7 +81,7 @@ int main(){
        
     
     }
-    send(server_fd, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
+   
     
     close(server_fd);
     tpool_destroy(tm);
