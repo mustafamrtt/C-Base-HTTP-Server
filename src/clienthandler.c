@@ -53,7 +53,7 @@ int get_method(char* buffer,int client_socket){
                         return -1;
                     }
                     if(filename[0]=='/'&&filename[1]=='\0'){
-                        strcpy(filename,"index.html");
+                        strcpy(filename,"/index.html");
                     }
                     printf("----------------------------------\n");
                     printf("FILE: %s-< \n",filename);
@@ -92,7 +92,7 @@ int get_method(char* buffer,int client_socket){
                     send(client_socket,file_content,fsize,0);
                     fclose(file);
                     free(file_content);
-                    
+                    send(client_socket, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
                     close(client_socket);
 
                     return 1;
@@ -101,10 +101,16 @@ int get_method(char* buffer,int client_socket){
            
 }
 void post_method(char* buffer,int header_length,int client_socket,int size){
-     if(buffer[header_length-1]=='\n'&&buffer[header_length-2]=='\r'&&buffer[header_length-3]=='\n'&&buffer[header_length-4]=='\r'){
+     if(parsefind(buffer,size)>0){
                     char *ok_response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
                     send(client_socket, ok_response, strlen(ok_response), 0);
                 }
+     else {
+                    char *bad_request = "HTTP/1.1 400 Bad Request\r\nContent-Length: 11\r\n\r\nBad Request";
+                    send(client_socket, bad_request, strlen(bad_request), 0);
+                    close(client_socket);
+                    return;
+                }           
                char path[256];
                sscanf(buffer, "%*s %s",path);
                printf("Path: %s\n",path);
@@ -141,6 +147,7 @@ void post_method(char* buffer,int header_length,int client_socket,int size){
                printf("POST body: %s\n",body);
 
                tokenizer(body);
+               
 
                
               
