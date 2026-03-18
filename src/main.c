@@ -8,8 +8,11 @@
 #include "../headers/content-type.h"
 #include "../headers/clienthandler.h"
 #include "../headers/TPOOL.h"
+#include <sys/epoll.h>
 #define PORT 8080
 #define BUFFER_SIZE 1024
+#define MAX_EVENTS 10
+struct epoll_event ev, events[MAX_EVENTS];
 
 const size_t num_threads = 4;
 
@@ -21,7 +24,7 @@ int main(){
    
     
 
-    int server_fd, new_socket;
+    int server_fd, new_socket,nfds,epollfd;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     
@@ -49,31 +52,64 @@ int main(){
     printf("Server is listening on %d port\n",PORT);
 
     tpool_t *tm;
-    int *vals;
     
+    epollfd = epoll_create1(0);
+    if(epollfd == -1) {
+        perror("epoll_create1");
+        exit(EXIT_FAILURE);
+    }
+      
+    ev.events = EPOLLIN;
+    ev.data.fd = server_fd;
 
     tm = tpool_create(num_threads);
+
+     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, server_fd, &ev) == -1) {
+               perror("epoll_ctl: listen_sock");
+               exit(EXIT_FAILURE);
+           }
 
    
     
     while(1){
+
+        nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+        if(nfds == -1){
+            perror("epoll_ctl: listen socket");
+            exit(EXIT_FAILURE);
+        }
+        for(int n=0;n<nfds;n++){
+            if(events[n].data.fd == server_fd){
+                 if((new_socket = accept(server_fd,(struct sockaddr*)&address,(socklen_t*)&addrlen))<0){
+                    perror("accept error");
+                    continue;
+                }
+                ClientArgs* clientArgs = (ClientArgs*)malloc(sizeof(ClientArgs));
+                clientArgs->server_fd = server_fd;
+                clientArgs->addrlen = addrlen;
+                clientArgs->address = address;
+                clientArgs->client_socket = new_socket;
+                setnonblocking(new_socket);
+                ev.events = EPOLLIN | EPOLLET;
+                ev.data.fd = new_socket;
+                if (epoll_ctl(epollfd, EPOLL_CTL_ADD, new_socket, &ev) == -1) {
+                   
+                    perror("epoll_ctl: add client socket");
+                    exit(EXIT_FAILURE);
+                }
+             else {
+                 tpool_add_work(tm,(thread_func_t)(clienthandler), (void*)clientArgs);
+                }
+            }
+        }
          
       
 
-        if((new_socket = accept(server_fd,(struct sockaddr*)&address,(socklen_t*)&addrlen))<0){
-            perror("accept error");
-            continue;
-        }
-        ClientArgs* clientArgs = (ClientArgs*)malloc(sizeof(ClientArgs));
-        clientArgs->server_fd = server_fd;
-        clientArgs->addrlen = addrlen;
-        clientArgs->address = address;
-        clientArgs->client_socket = new_socket;
-
+        
 
 
        
-        tpool_add_work(tm,(thread_func_t)(clienthandler), (void*)clientArgs);
+        
 
 
 
