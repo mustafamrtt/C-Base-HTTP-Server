@@ -7,7 +7,9 @@
 #include <pthread.h>
 #include "../headers/content-type.h"
 #include "../headers/clienthandler.h"
+#include <sys/epoll.h>
 #define BUFFER_SIZE 4096
+
 
 
 int parsefind(char* buffer,size_t len){
