@@ -7,11 +7,25 @@
 #include <pthread.h>
 #include "../headers/content-type.h"
 #include "../headers/clienthandler.h"
+<<<<<<< HEAD
 #include <sys/epoll.h>
 #define BUFFER_SIZE 4096
 
 
 
+=======
+<<<<<<< HEAD
+#define BUFFER_SIZE 4096
+
+
+=======
+#include <sys/epoll.h>
+#define BUFFER_SIZE 4096
+
+
+
+>>>>>>> feature/epoll
+>>>>>>> feature/threadpool
 int parsefind(char* buffer,size_t len){
     if(len<4){
         return 0;

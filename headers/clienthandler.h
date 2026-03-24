@@ -5,11 +5,12 @@
 #include <stdbool.h>
 typedef struct ClientArgs{
     int client_socket;
-    int server_fd;
     int addrlen;
-    
+
+    int server_fd;
     struct sockaddr_in address;
 }ClientArgs;
+
 void* clienthandler(void* arg);
 int parsefind(char* buffer,size_t len);
 void tokenizer(char* body);
