@@ -5,8 +5,8 @@
 #include <stdbool.h>
 typedef struct ClientArgs{
     int client_socket;
-    int server_fd;
     int addrlen;
+    int server_fd;
     
     struct sockaddr_in address;
 }ClientArgs;
