@@ -7,9 +7,17 @@
 #include <pthread.h>
 #include "../headers/content-type.h"
 #include "../headers/clienthandler.h"
+<<<<<<< HEAD
 #define BUFFER_SIZE 4096
 
 
+=======
+#include <sys/epoll.h>
+#define BUFFER_SIZE 4096
+
+
+
+>>>>>>> feature/epoll
 int parsefind(char* buffer,size_t len){
     if(len<4){
         return 0;
