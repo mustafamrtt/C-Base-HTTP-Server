@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include "../headers/content-type.h"
 #include "../headers/clienthandler.h"
-
+#include <errno.h>
 #include <sys/epoll.h>
 #define BUFFER_SIZE 4096
 
@@ -174,14 +174,26 @@ void* clienthandler(void* arg){
     
     int size=0;
         while(1){
-           int bytes = recv(client_socket,buffer+size,BUFFER_SIZE-size,0);
-           if(bytes<=0){
+           int bytes = recv(client_socket, buffer+size, BUFFER_SIZE-size, 0);
+     if(bytes > 0){
+        size += bytes;
+        if(parsefind(buffer, size)){
             break;
-           }
-           size+=bytes;
-           if(parsefind(buffer,size)){
-            break;
-           }
+        }
+    } else if(bytes == 0){
+        close(client_socket);
+        free(clientArgs);
+        return NULL;
+    } else {
+        if(errno == EAGAIN || errno == EWOULDBLOCK){
+            // veri henüz gelmedi, biraz bekle
+            usleep(1000);
+            continue;  // ← break değil, continue
+        }
+        close(client_socket);
+        free(clientArgs);
+        return NULL;
+    }
             
            
            if(size>=BUFFER_SIZE){

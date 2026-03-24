@@ -3,12 +3,15 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <stdbool.h>
+#define BUFFER_SIZE 4096
 typedef struct ClientArgs{
     int client_socket;
     int addrlen;
 
     int server_fd;
     struct sockaddr_in address;
+    char buffer[BUFFER_SIZE];
+    int bytes;
 }ClientArgs;
 
 void* clienthandler(void* arg);
