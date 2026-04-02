@@ -33,7 +33,7 @@ int main(){
    
     
 
-    int server_fd, new_socket,nfds,epollfd;
+    int server_fd,nfds,epollfd;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     

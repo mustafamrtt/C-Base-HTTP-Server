@@ -98,7 +98,7 @@ int get_method(char* buffer,int client_socket){
                     send(client_socket,file_content,fsize,0);
                     fclose(file);
                     free(file_content);
-                    send(client_socket, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
+                   
                     close(client_socket);
 
                     return 1;
@@ -107,16 +107,14 @@ int get_method(char* buffer,int client_socket){
            
 }
 void post_method(char* buffer,int header_length,int client_socket,int size){
-     if(parsefind(buffer,size)>0){
-                    char *ok_response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
-                    send(client_socket, ok_response, strlen(ok_response), 0);
-                }
-     else {
-                    char *bad_request = "HTTP/1.1 400 Bad Request\r\nContent-Length: 11\r\n\r\nBad Request";
+             if(parsefind(buffer,size)<0){
+                     char *bad_request = "HTTP/1.1 400 Bad Request\r\nContent-Length: 11\r\n\r\nBad Request";
                     send(client_socket, bad_request, strlen(bad_request), 0);
                     close(client_socket);
                     return;
-                }           
+                   
+                }
+             
                char path[256];
                sscanf(buffer, "%*s %s",path);
                printf("Path: %s\n",path);
@@ -129,8 +127,7 @@ void post_method(char* buffer,int header_length,int client_socket,int size){
 
                
                
-               
-               char* body_start = buffer+header_length;
+              
                int bodyinbuffer = size-header_length;
 
                int remaining = content_length-bodyinbuffer;
@@ -153,6 +150,9 @@ void post_method(char* buffer,int header_length,int client_socket,int size){
                printf("POST body: %s\n",body);
 
                tokenizer(body);
+
+               char *ok_response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
+               send(client_socket, ok_response, strlen(ok_response), 0);
                
 
                
