@@ -154,17 +154,11 @@ void post_method(char* buffer,int header_length,int client_socket,int size){
 
                char *ok_response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
                send(client_socket, ok_response, strlen(ok_response), 0);
-               
-
-               
-              
-        }
-               
-        
-               
-
-        
-            
+            }else{
+                char *not_found = "HTTP/1.1 404 Not Found\r\nContent-Length: 9\r\n\r\nNot Found";
+                send(client_socket, not_found, strlen(not_found), 0);
+            }
+               close(client_socket);
 }
 
 
@@ -188,9 +182,9 @@ void* clienthandler(void* arg){
         return NULL;
     } else {
         if(errno == EAGAIN || errno == EWOULDBLOCK){
-            // veri henüz gelmedi, biraz bekle
+           
             usleep(1000);
-            continue;  // ← break değil, continue
+            continue; 
         }
         close(client_socket);
         free(clientArgs);
@@ -233,11 +227,15 @@ void* clienthandler(void* arg){
              
             }
             else if(strncmp(buffer,"POST",4)==0){
+
                 int header_length = parsefind(buffer,size);
                 
                 post_method(buffer,header_length,client_socket,size);
                 close(client_socket);
                 free(clientArgs);
+
+               
+    
             }
 
             else {
