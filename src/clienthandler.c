@@ -20,7 +20,7 @@ int parsefind(char* buffer,size_t len){
     if(len<4){
         return 0;
     }
-    for(int i=3;i<len;i++){
+    for(size_t i=3;i<len;i++){
         if(buffer[i-3]=='\r'&&buffer[i-2]=='\n'&&buffer[i-1]=='\r'&&buffer[i]=='\n')
             return i+1;
     }
@@ -64,7 +64,7 @@ int get_method(char* buffer,int client_socket){
                     printf("----------------------------------\n");
                     printf("FILE: %s-< \n",filename);
                     printf("----------------------------\n");   
-                    char path[255] = "../public/";
+                    char path[255] = "public/";
                     strcat(path,filename+1);
                     FILE* file = fopen((path),"rb");
                     if(file==NULL){
@@ -104,6 +104,7 @@ int get_method(char* buffer,int client_socket){
                     return 1;
                     
                 }
+                return -1;
            
 }
 void post_method(char* buffer,int header_length,int client_socket,int size){
@@ -159,6 +160,7 @@ void post_method(char* buffer,int header_length,int client_socket,int size){
               
         }
                
+        
                
 
         
